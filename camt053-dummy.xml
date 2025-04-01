@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <BkToCstmrStmt>
+    <GrpHdr>
+      <MsgId>CAMT053-DUMMY-20250321</MsgId>
+      <CreDtTm>2025-03-21T10:15:30</CreDtTm>
+    </GrpHdr>
+    <Stmt>
+      <Id>STMT2025032101</Id>
+      <ElctrncSeqNb>1</ElctrncSeqNb>
+      <CreDtTm>2025-03-21T10:15:30</CreDtTm>
+      <Acct>
+        <Id>
+                        <IBAN>CH5604835012345678009</IBAN>
+        </Id>
+        <Ccy>CHF</Ccy>
+        <Ownr>
+          <Nm>CAFE DU LAC SÀRL</Nm>
+        </Ownr>
+      </Acct>
+      <Bal>
+        <Tp>
+          <CdOrPrtry>
+            <Cd>OPBD</Cd>
+          </CdOrPrtry>
+        </Tp>
+        <Amt Ccy="CHF">5874.32</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Dt>
+          <Dt>2025-03-01</Dt>
+        </Dt>
+      </Bal>
+      <Bal>
+        <Tp>
+          <CdOrPrtry>
+            <Cd>CLBD</Cd>
+          </CdOrPrtry>
+        </Tp>
+        <Amt Ccy="CHF">6123.45</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Dt>
+          <Dt>2025-03-20</Dt>
+        </Dt>
+      </Bal>
+      <Ntry>
+        <Amt Ccy="CHF">128.90</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts>BOOK</Sts>
+        <BookgDt>
+          <Dt>2025-03-02</Dt>
+        </BookgDt>
+        <ValDt>
+          <Dt>2025-03-02</Dt>
+        </ValDt>
+        <BkTxCd>
+          <Prtry>
+            <Cd>PAYMENT</Cd>
+          </Prtry>
+        </BkTxCd>
+        <NtryDtls>
+          <TxDtls>
+            <Refs>
+              <AcctSvcrRef>REF2025030201</AcctSvcrRef>
+            </Refs>
+            <RltdPties>
+              <Dbtr>
+                <Nm>DURAND JEAN-PIERRE</Nm>
+              </Dbtr>
+            </RltdPties>
+            <RmtInf>
+              <Ustrd>REGLT FACT. 2542-A CAFE+CROISSANTS. MERCI JP</Ustrd>
+            </RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="CHF">45.80</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <Sts>BOOK</Sts>
+        <BookgDt>
+          <Dt>2025-03-03</Dt>
+        </BookgDt>
+        <ValDt>
+          <Dt>2025-03-03</Dt>
+        </ValDt>
+        <BkTxCd>
+          <Prtry>
+            <Cd>DIRECT_DEBIT</Cd>
+          </Prtry>
+        </BkTxCd>
+        <NtryDtls>
+          <TxDtls>
+            <Refs>
+              <AcctSvcrRef>REF2025030301</AcctSvcrRef>
+            </Refs>
+            <RltdPties>
+              <Cdtr>
+                <Nm>ROMANDE ENERGIE SA</Nm>
+              </Cdtr>
+            </RltdPties>
+            <RmtInf>
+              <Ustrd>PRLVT ROMANDE ENERGIE ELECTRICITE 03/25 CL32587</Ustrd>
+            </RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="CHF">532.40</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <Sts>BOOK</Sts>
+        <BookgDt>
+          <Dt>2025-03-05</Dt>
+        </BookgDt>
+        <ValDt>
+          <Dt>2025-03-05</Dt>
+        </ValDt>
+        <BkTxCd>
+          <Prtry>
+            <Cd>TRANSFER</Cd>
+          </Prtry>
+        </BkTxCd>
+        <NtryDtls>
+          <TxDtls>
+            <Refs>
+              <AcctSvcrRef>REF2025030501</AcctSvcrRef>
+            </Refs>
+            <RltdPties>
+              <Cdtr>
+                <Nm>CAFFE IMPORT GMBH</Nm>
+              </Cdtr>
+            </RltdPties>
+            <RmtInf>
+              <Ustrd>VIREMENT COMMANDE CAFES MARS NO.4587-B</Ustrd>
+            </RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="CHF">753.20</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts>BOOK</Sts>
+        <BookgDt>
+          <Dt>2025-03-08</Dt>
+        </BookgDt>
+        <ValDt>
+          <Dt>2025-03-08</Dt>
+        </ValDt>
+        <BkTxCd>
+          <Prtry>
+            <Cd>PAYMENT</Cd>
+          </Prtry>
+        </BkTxCd>
+        <NtryDtls>
+          <TxDtls>
+            <Refs>
+              <AcctSvcrRef>REF2025030801</AcctSvcrRef>
+            </Refs>
+            <RltdPties>
+              <Dbtr>
+                <Nm>BOULANGERIE DUBOIS SA</Nm>
+              </Dbtr>
+            </RltdPties>
+            <RmtInf>
+              <Ustrd>PAIEMENT FACTURE 20250301-42 COMM. CAFE EVENEMENT 07/03</Ustrd>
+            </RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="CHF">86.70</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <Sts>BOOK</Sts>
+        <BookgDt>
+          <Dt>2025-03-10</Dt>
+        </BookgDt>
+        <ValDt>
+          <Dt>2025-03-10</Dt>
+        </ValDt>
+        <BkTxCd>
+          <Prtry>
+            <Cd>DIRECT_DEBIT</Cd>
+          </Prtry>
+        </BkTxCd>
+        <NtryDtls>
+          <TxDtls>
+            <Refs>
+              <AcctSvcrRef>REF2025031001</AcctSvcrRef>
+            </Refs>
+            <RltdPties>
+              <Cdtr>
+                <Nm>SWISSCOM AG</Nm>
+              </Cdtr>
+            </RltdPties>
+            <RmtInf>
+              <Ustrd>LSV SWISSCOM AG 03/25 ABONNEMENT+5G+INTL</Ustrd>
+            </RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="CHF">1250.00</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <Sts>BOOK</Sts>
+        <BookgDt>
+          <Dt>2025-03-12</Dt>
+        </BookgDt>
+        <ValDt>
+          <Dt>2025-03-12</Dt>
+        </ValDt>
+        <BkTxCd>
+          <Prtry>
+            <Cd>TRANSFER</Cd>
+          </Prtry>
+        </BkTxCd>
+        <NtryDtls>
+          <TxDtls>
+            <Refs>
+              <AcctSvcrRef>REF2025031201</AcctSvcrRef>
+            </Refs>
+            <RltdPties>
+              <Cdtr>
+                <Nm>MUELLER SOPHIE</Nm>
+              </Cdtr>
+            </RltdPties>
+            <RmtInf>
+              <Ustrd>VIREMENT SALAIRE S.MUELLER 03/25</Ustrd>
+            </RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="CHF">250.40</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts>BOOK</Sts>
+        <BookgDt>
+          <Dt>2025-03-15</Dt>
+        </BookgDt>
+        <ValDt>
+          <Dt>2025-03-15</Dt>
+        </ValDt>
+        <BkTxCd>
+          <Prtry>
+            <Cd>PAYMENT_TERMINAL</Cd>
+          </Prtry>
+        </BkTxCd>
+        <NtryDtls>
+          <TxDtls>
+            <Refs>
+              <AcctSvcrRef>REF2025031501</AcctSvcrRef>
+            </Refs>
+            <RmtInf>
+              <Ustrd>REMISE CARTES 14/03 TOTAL:27 OP.COMM 1,80% CHF</Ustrd>
+            </RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="CHF">123.45</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <Sts>BOOK</Sts>
+        <BookgDt>
+          <Dt>2025-03-17</Dt>
+        </BookgDt>
+        <ValDt>
+          <Dt>2025-03-17</Dt>
+        </ValDt>
+        <BkTxCd>
+          <Prtry>
+            <Cd>WITHDRAWAL</Cd>
+          </Prtry>
+        </BkTxCd>
+        <NtryDtls>
+          <TxDtls>
+            <Refs>
+              <AcctSvcrRef>REF2025031701</AcctSvcrRef>
+            </Refs>
+            <RmtInf>
+              <Ustrd>RETRAIT BANCOMAT 17/03 14H22 LAUSANNE PLACE ST-FRANCOIS</Ustrd>
+            </RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="CHF">398.70</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts>BOOK</Sts>
+        <BookgDt>
+          <Dt>2025-03-19</Dt>
+        </BookgDt>
+        <ValDt>
+          <Dt>2025-03-19</Dt>
+        </ValDt>
+        <BkTxCd>
+          <Prtry>
+            <Cd>PAYMENT</Cd>
+          </Prtry>
+        </BkTxCd>
+        <NtryDtls>
+          <TxDtls>
+            <Refs>
+              <AcctSvcrRef>REF2025031901</AcctSvcrRef>
+            </Refs>
+            <RltdPties>
+              <Dbtr>
+                <Nm>AUBERGE DU LAC SARL</Nm>
+              </Dbtr>
+            </RltdPties>
+            <RmtInf>
+              <Ustrd>REGLEMENT COMMANDE SPEC. ROBUSTA BIO MENSUELLE</Ustrd>
+            </RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="CHF">67.82</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <Sts>BOOK</Sts>
+        <BookgDt>
+          <Dt>2025-03-20</Dt>
+        </BookgDt>
+        <ValDt>
+          <Dt>2025-03-20</Dt>
+        </ValDt>
+        <BkTxCd>
+          <Prtry>
+            <Cd>DIRECT_DEBIT</Cd>
+          </Prtry>
+        </BkTxCd>
+        <NtryDtls>
+          <TxDtls>
+            <Refs>
+              <AcctSvcrRef>REF2025032001</AcctSvcrRef>
+            </Refs>
+            <RltdPties>
+              <Cdtr>
+                <Nm>SERVICES INDUSTRIELS DE LAUSANNE</Nm>
+              </Cdtr>
+            </RltdPties>
+            <RmtInf>
+              <Ustrd>LSV SIL EAU REF: SIL78954123 T1-2025</Ustrd>
+            </RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+    </Stmt>
+  </BkToCstmrStmt>
+</Document>
