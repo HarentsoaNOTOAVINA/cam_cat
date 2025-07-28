@@ -2,7 +2,7 @@
 
 public static class ConfigurationReader
 {
-    private static readonly Dictionary<string, string> _envVariables = new Dictionary<string, string>();
+    private static readonly Dictionary<string, string> EnvVariables = new Dictionary<string, string>();
 
     public static void LoadConfiguration(string filePath = ".env")
     {
@@ -23,14 +23,14 @@ public static class ConfigurationReader
             var parts = trimmedLine.Split('=', 2);
             if (parts.Length != 2) continue;
 
-            _envVariables[parts[0].Trim()] = parts[1].Trim();
+            EnvVariables[parts[0].Trim()] = parts[1].Trim();
             Console.WriteLine($"Loaded config: {parts[0]} = {parts[1]}");
         }
     }
 
-    public static string GetValue(string key)
+    public static string? GetValue(string key)
     {
-        if (_envVariables.TryGetValue(key, out var value))
+        if (EnvVariables.TryGetValue(key, out var value))
         {
             return value;
         }

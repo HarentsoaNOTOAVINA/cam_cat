@@ -6,13 +6,13 @@ namespace CamtParser.Service;
 
 public class LlmService
 {
-    private readonly string _apiKey;
-    private readonly string _apiUrl;
+    private readonly string? _apiKey;
+    private readonly string? _apiUrl;
 
     public LlmService()
     {
         _apiKey = ConfigurationReader.GetValue("LLM_API_KEY");
-        
+
         // Fix: Use LLM_API_BASE_URL instead of LLM_API_URL
         _apiUrl = ConfigurationReader.GetValue("LLM_API_BASE_URL");
     }
@@ -29,22 +29,32 @@ public class LlmService
                     {
                         new
                         {
-                            text = @$"Act as a banking expert. Your task is to standardize bank transaction labels.
+                            text =
+                                @$"Tu es un assistant bancaire. Ton rôle est de reformuler des libellés bancaires en français clair pour les rendre compréhensibles pour l’utilisateur.
         
-                                Input label: {originalLabel}
-                                Transaction amount: {amount}€
-        
-                                Rules:
-                                1. Make the label more readable and clear
-                                2. Keep essential transaction information
-                                3. Standardize common terms (e.g., 'VIR SEPA' to 'Virement', 'PRLV SEPA' to 'Prélèvement', 'CARTE' to 'Paiement carte', 'CB' to 'Carte bancaire')
-                                4. Capitalize first letter, rest in lowercase
-                                5. Remove unnecessary technical codes
-                                6. Change the date format to french (e.g., '12/04' to '12 avril')
-                                7. Keep merchant/company names if present
-        
-                                Output only the harmonized label without any explanation.
-                                For example, if i have 'PRLV SEPA MUTUELSANTE 552142259', the output willi be 'Prélèvement mutuelle santé - mensuel'.
+                                Libellé d'entrée : {{originalLabel}}
+                                Montant de la transaction : {{amount}}€
+
+                                Règles :
+
+                                Rendre le libellé plus lisible et clair
+
+                                Conserver les informations essentielles de la transaction
+
+                                Standardiser les termes courants (par exemple : 'VIR SEPA' devient 'Virement', 'PRLV SEPA' devient 'Prélèvement', 'CARTE' devient 'Paiement carte', 'CB' devient 'Carte bancaire')
+
+                                Mettre une majuscule à la première lettre, le reste en minuscules
+
+                                Supprimer les codes techniques inutiles
+
+                                Transformer les dates au format français (ex : '12/04' devient '12 avril')
+
+                                Conserver les noms de commerçants ou d'entreprises s’ils sont présents
+
+                                Affiche uniquement le libellé harmonisé, sans aucune explication.
+                                Par exemple, si le libellé est: 
+                                - « PRLV SEPA MUTUELSANTE 552142259 », la sortie doit être : « Prélèvement mutuelle santé - mensuel ».
+                                -  « CB CARREFOUR CITY PARIS 12/04 », la sortie doit être : « Courses supermarché Carrefour City - 12 avril ».
                                 "
                         }
                     }
@@ -54,7 +64,7 @@ public class LlmService
 
         // Fix: Construct the full URL with API key as a query parameter
         var fullUrl = $"{_apiUrl}?key={_apiKey}";
-        
+
         var content = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
         var response = await client.PostAsync(fullUrl, content);
 
@@ -68,11 +78,8 @@ public class LlmService
                 .GetProperty("parts")[0]
                 .GetProperty("text")
                 .GetString() ?? originalLabel;
-
-            return harmonized.Replace("PRLV SEPA", "Prélèvement ")
-                .Replace("VIR SEPA", "Virement ")
-                .Replace("CARTE ", "Paiement carte ")
-                .Replace("CB ", "Carte bancaire ");
+            
+            return harmonized;
         }
 
         throw new Exception($"LLM API error: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
@@ -83,7 +90,7 @@ public class LlmService
         using (var client = new HttpClient())
         {
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            
+
             Console.WriteLine("Harmonization...");
 
             for (int i = 0; i < transactions.Count; i++)
