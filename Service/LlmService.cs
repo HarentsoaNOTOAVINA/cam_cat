@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using CamtParser.model;
 
 namespace CamtParser.Service;
 
@@ -17,7 +18,7 @@ public class LlmService
         _apiUrl = ConfigurationReader.GetValue("LLM_API_BASE_URL");
     }
 
-    private async Task<string> GetHarmonizedLabelFromLlm(HttpClient client, string originalLabel, decimal amount)
+    private async Task<string> GetHarmonizedLabelFromLlm(HttpClient client, string originalLabel)
     {
         var requestData = new
         {
@@ -100,7 +101,7 @@ public class LlmService
                 try
                 {
                     string harmonizedLabel =
-                        await GetHarmonizedLabelFromLlm(client, transaction.OriginalLabel, transaction.Amount);
+                        await GetHarmonizedLabelFromLlm(client, transaction.OriginalLabel);
                     transaction.HarmonizedLabel = harmonizedLabel;
 
                     if (i % 5 == 0 || i == transactions.Count - 1)

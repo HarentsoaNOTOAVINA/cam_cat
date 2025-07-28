@@ -2,19 +2,23 @@
 using System.Globalization;
 using System.Text;
 using System.Xml.Linq;
+using CamtParser.model;
 using CamtParser.Service;
 
 namespace CamtParser;
 
 internal abstract class Program
 {
-    private static readonly LlmService Service;
+    private static readonly LlmService LlmService;
+    private static readonly XmlLoadService XmlService;
 
     static Program()
     {
         ConfigurationReader.LoadConfiguration();
-        Service = new LlmService();
+        LlmService = new LlmService();
+        XmlService = new XmlLoadService();
     }
+    
 
     public static async Task Main(string[] args)
     {
@@ -34,7 +38,7 @@ internal abstract class Program
             var transactions = ExtractTransactionsFromCamt(filePath);
                 
             // Harmonisation des libellés avec un LLM
-            await Service.HarmonizeLabelsWithLlm(transactions);
+            await LlmService.HarmonizeLabelsWithLlm(transactions);
                 
             // Affichage des résultats
             DisplayResults(transactions);
@@ -57,11 +61,11 @@ internal abstract class Program
             
             try
             {
-                // Chargement du fichier XML
-                XDocument doc = XDocument.Load(filePath);
+                // Use the safer Xml loading method
+                XDocument? doc = XmlService.SafeLoadXml(filePath);
                 
                 // Définition des namespaces CAMT
-                Debug.Assert(doc.Root != null, "doc.Root != null");
+                Debug.Assert(doc?.Root != null, "doc.Root != null");
                 XNamespace ns = doc.Root.GetDefaultNamespace();
                 
                 // Recherche des transactions dans le document
