@@ -9,17 +9,52 @@ public class LlmService
 {
     private readonly string? _apiKey;
     private readonly string? _apiUrl;
+    private const int BatchSize = 10;
 
     public LlmService()
     {
         _apiKey = ConfigurationReader.GetValue("LLM_API_KEY");
-
-        // Fix: Use LLM_API_BASE_URL instead of LLM_API_URL
+        // Ensure we are getting the correct base URL key as previously identified
         _apiUrl = ConfigurationReader.GetValue("LLM_API_BASE_URL");
     }
 
-    private async Task<string> GetHarmonizedLabelFromLlm(HttpClient client, string originalLabel)
+    private class TransactionInput
     {
+        public int Id { get; set; }
+        public string Label { get; set; } = "";
+        public decimal Amount { get; set; }
+    }
+
+    private class HarmonizedOutput
+    {
+        public int Id { get; set; }
+        public string HarmonizedLabel { get; set; } = "";
+    }
+
+    private async Task<List<HarmonizedOutput>> GetHarmonizedBatch(HttpClient client, List<TransactionInput> batch)
+    {
+        string jsonInput = JsonSerializer.Serialize(batch);
+        
+        string prompt = @$"
+Tu es un assistant expert bancaire. Ta tâche est de reformuler une liste de libellés bancaires pour les rendre lisibles.
+
+Voici la liste des transactions à traiter (format JSON) :
+{jsonInput}
+
+Règles de transformation :
+1. Rendre le libellé clair et concis.
+2. Standardiser les termes (ex: 'VIR' -> 'Virement', 'PRLV' -> 'Prélèvement').
+3. Mettre une majuscule au début, le reste en minuscules (sauf noms propres).
+4. Supprimer les références techniques inutiles.
+5. Formater les dates (ex: '12/04' -> '12 avril').
+6. Conserver les noms des tiers.
+
+IMPORTANT : Tu dois répondre UNIQUEMENT par un tableau JSON valide contenant les libellés harmonisés, avec la structure suivante :
+[{{""Id"": 1, ""HarmonizedLabel"": ""Libellé reformulé""}}, ...]
+
+Ne mets PAS de markdown, PAS de code block, juste le JSON brut. Assure-toi de renvoyer une entrée pour CHAQUE élément de la liste d'entrée, avec le même ID.
+";
+
         var requestData = new
         {
             contents = new[]
@@ -28,95 +63,103 @@ public class LlmService
                 {
                     parts = new[]
                     {
-                        new
-                        {
-                            text =
-                                @$"Tu es un assistant bancaire. Ton rôle est de reformuler des libellés bancaires en français clair pour les rendre compréhensibles pour l’utilisateur.
-        
-                                Libellé d'entrée : {{originalLabel}}
-                                Montant de la transaction : {{amount}}€
-
-                                Règles :
-
-                                Rendre le libellé plus lisible et clair
-
-                                Conserver les informations essentielles de la transaction
-
-                                Standardiser les termes courants (par exemple : 'VIR SEPA' devient 'Virement', 'PRLV SEPA' devient 'Prélèvement', 'CARTE' devient 'Paiement carte', 'CB' devient 'Carte bancaire')
-
-                                Mettre une majuscule à la première lettre, le reste en minuscules
-
-                                Supprimer les codes techniques inutiles
-
-                                Transformer les dates au format français (ex : '12/04' devient '12 avril')
-
-                                Conserver les noms de commerçants ou d'entreprises s’ils sont présents
-
-                                Affiche uniquement le libellé harmonisé, sans aucune explication.
-                                Par exemple, si le libellé est: 
-                                - « PRLV SEPA MUTUELSANTE 552142259 », la sortie doit être : « Prélèvement mutuelle santé - mensuel ».
-                                -  « CB CARREFOUR CITY PARIS 12/04 », la sortie doit être : « Courses supermarché Carrefour City - 12 avril ».
-                                "
-                        }
+                        new { text = prompt }
                     }
                 }
             }
         };
 
-        // Fix: Construct the full URL with API key as a query parameter
         var fullUrl = $"{_apiUrl}?key={_apiKey}";
-
         var content = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
-        var response = await client.PostAsync(fullUrl, content);
 
-        if (response.IsSuccessStatusCode)
+        try 
         {
+            var response = await client.PostAsync(fullUrl, content);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                string errorBody = await response.Content.ReadAsStringAsync();
+                throw new Exception($"API Error: {response.StatusCode} - {errorBody}");
+            }
+
             var responseContent = await response.Content.ReadAsStringAsync();
-            var responseObject = JsonSerializer.Deserialize<JsonElement>(responseContent);
-            var harmonized = responseObject
-                .GetProperty("candidates")[0]
+            using var doc = JsonDocument.Parse(responseContent);
+            
+            // Extract the text from Gemini response structure
+            var candidates = doc.RootElement.GetProperty("candidates");
+            if (candidates.GetArrayLength() == 0) return new List<HarmonizedOutput>();
+
+            var text = candidates[0]
                 .GetProperty("content")
                 .GetProperty("parts")[0]
                 .GetProperty("text")
-                .GetString() ?? originalLabel;
-            
-            return harmonized;
-        }
+                .GetString();
 
-        throw new Exception($"LLM API error: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
+            if (string.IsNullOrEmpty(text)) return new List<HarmonizedOutput>();
+
+            // Clean up potentially wrapped markdown (```json ... ```)
+            text = text.Replace("```json", "").Replace("```", "").Trim();
+
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            return JsonSerializer.Deserialize<List<HarmonizedOutput>>(text, options) ?? new List<HarmonizedOutput>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"\nBatch API Warning: {ex.Message}");
+            return new List<HarmonizedOutput>(); // Fail gracefully for this batch
+        }
     }
 
     public async Task HarmonizeLabelsWithLlm(List<Transaction> transactions)
     {
-        using (var client = new HttpClient())
+        using var client = new HttpClient();
+        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+        Console.WriteLine($"Harmonizing {transactions.Count} transactions in batches of {BatchSize}...");
+
+        for (int i = 0; i < transactions.Count; i += BatchSize)
         {
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            var batch = transactions.Skip(i).Take(BatchSize).ToList();
+            var inputs = batch.Select((t, index) => new TransactionInput 
+            { 
+                Id = index, 
+                Label = t.OriginalLabel,
+                Amount = t.Amount
+            }).ToList();
 
-            Console.WriteLine("Harmonization...");
+            Console.Write($"\rProcessing batch {(i / BatchSize) + 1}/{(int)Math.Ceiling(transactions.Count / (double)BatchSize)}...");
 
-            for (int i = 0; i < transactions.Count; i++)
+            try
             {
-                var transaction = transactions[i];
+                var outputs = await GetHarmonizedBatch(client, inputs);
 
-                try
+                foreach (var output in outputs)
                 {
-                    string harmonizedLabel =
-                        await GetHarmonizedLabelFromLlm(client, transaction.OriginalLabel);
-                    transaction.HarmonizedLabel = harmonizedLabel;
-
-                    if (i % 5 == 0 || i == transactions.Count - 1)
+                    if (output.Id >= 0 && output.Id < batch.Count)
                     {
-                        Console.Write($"\rProgression: {i + 1}/{transactions.Count}");
+                        batch[output.Id].HarmonizedLabel = output.HarmonizedLabel;
                     }
                 }
-                catch (Exception ex)
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"\nError in loop: {ex.Message}");
+            }
+            
+            // Fill in any missing or failed ones with original label
+            foreach (var t in batch)
+            {
+                if (string.IsNullOrEmpty(t.HarmonizedLabel))
                 {
-                    transaction.HarmonizedLabel = transaction.OriginalLabel;
-                    Console.WriteLine($"\nHarmonization error for the transaction {i}: {ex.Message}");
+                    t.HarmonizedLabel = t.OriginalLabel;
                 }
             }
 
-            Console.WriteLine("\nHarmonization done.");
+            // Simple rate limiting avoidance
+            if (i + BatchSize < transactions.Count) 
+                await Task.Delay(1000); 
         }
+
+        Console.WriteLine("\nHarmonization done.");
     }
 }

@@ -86,7 +86,14 @@ internal abstract class Program
                         var txDetails = entry.Elements(ns + "NtryDtls")
                             .Elements(ns + "TxDtls").FirstOrDefault();
                         
-                        string? reference = txDetails?.Element(ns + "Refs")?.Element(ns + "InstrId")?.Value;
+                        // Corrected reference extraction based on CAMT guide (AcctSvcrRef)
+                        string? reference = txDetails?.Element(ns + "Refs")?.Element(ns + "AcctSvcrRef")?.Value;
+                        
+                        // Fallback to InstrId if AcctSvcrRef is missing (defensive coding)
+                        if (string.IsNullOrEmpty(reference))
+                        {
+                            reference = txDetails?.Element(ns + "Refs")?.Element(ns + "InstrId")?.Value;
+                        }
                         
                         // Récupération du libellé (plusieurs possibilités selon la structure CAMT)
                         string? label = txDetails?.Element(ns + "RmtInf")?.Element(ns + "Ustrd")?.Value;
