@@ -38,3 +38,4 @@ L'interaction avec le LLM (Google Gemini) est optimisée par **batching**.
 1.  Configurer l'API Key dans `.env` ou `AppConfig`.
 2.  Placer le fichier CAMT source.
 3.  Lancer : `dotnet run`
+4.  Lancer Tests: dotnet test
